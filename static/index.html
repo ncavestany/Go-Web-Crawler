@@ -1,12 +1,81 @@
 <html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333; 
+            color: #fff; 
+            flex-direction: column;
+        }
+        h1 {
+            font-style: oblique;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color:rgb(64, 74, 92);
+            border: 1px solid #666; 
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip {
+            position:relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            top: 150%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip label:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+    </style>
+    <title>Index Search</title>
+    </head>
     <body>
+        <h1> Index Search </h1>
         <form action="/search" method="get">
             <label for="inputBox">Search</label>
-            <input id="inputBox" name="term"/>
-            <button type="submit">Go</button>
+            <input id="inputBox" name="term" placeholder="Search term here"/>
+            <button type="submit" class="pure-button pure-button-primary">Go</button>
             <br>
-            <input type="checkbox" id="wildcard" name="wildcard" value="wildcard">
-            <label for="wildcard">Wildcard Search</label>
+            <div class="tooltip">
+                <input type="checkbox" id="wildcard" name="wildcard" value="wildcard">
+                <label for="wildcard">Wildcard Search</label>
+                <span class="tooltiptext"> Search for words with the same prefix.
+                    Ex: ball returns results for balloon, ballerina.
+                </span>
+            </div>
         </form>
     </body>
 </html>
