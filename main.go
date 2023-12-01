@@ -15,6 +15,7 @@ func main() {
 
 	// Serve the "static" folder at the base URL ("/")
 	http.Handle("/", http.FileServer(http.Dir("static")))
+	http.Handle("static/project06.css", http.FileServer(http.Dir("./")))
 
 	// Start the HTTP server in a goroutine
 	go func() {

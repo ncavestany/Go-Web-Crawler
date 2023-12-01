@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"sort"
@@ -20,7 +21,7 @@ func (ebook *Index) searchDatabase(searchWord string) []string {
 	return displayTfIdfValues
 }
 
-func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice, displayTfIdfValues []string) {
+func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice) {
 	query := "SELECT id FROM words WHERE name LIKE ?"
 	rows, err := ebook.db.Query(query, searchWord+"%")
 	if err != nil {
@@ -33,17 +34,14 @@ func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice
 		err := rows.Scan(&wordID)
 		if err == nil {
 			word := ebook.getWord(wordID)
-			// fmt.Println("Current word:" + word)
+			fmt.Println("Current word:" + word)
 			tfIdfValues := ebook.sortTfIdf(word)
 			allTfIdfValues = append(allTfIdfValues, tfIdfValues...)
 		}
 	}
 
 	sort.Sort(allTfIdfValues)
-	for _, currentTfIdfValues := range allTfIdfValues {
-		displayTfIdfValues = append(displayTfIdfValues, fmt.Sprint(currentTfIdfValues.Title)+" : "+fmt.Sprint(currentTfIdfValues.TfIdf))
-	}
-	return allTfIdfValues, displayTfIdfValues
+	return allTfIdfValues
 }
 
 func isBigram(query string) bool {
@@ -70,7 +68,7 @@ func (ebook *Index) bigramSearch(word1 string, word2 string) []string {
 }
 
 // For searching bigram wildcards - example: computer scien% gives computer science and computer scientist.
-func (ebook *Index) bigramWildcardSearch(word1, word2 string) (displayTfIdfValues []string) {
+func (ebook *Index) bigramWildcardSearch(word1, word2 string) (displayTfIdfValues TfIdfSlice) {
 	var similarWordIDs []int
 	var allTfIdfValues TfIdfSlice
 	query := "SELECT id FROM words WHERE name LIKE ?"
@@ -99,19 +97,19 @@ func (ebook *Index) bigramWildcardSearch(word1, word2 string) (displayTfIdfValue
 		defer similarWordOccurrences.Close()
 	}
 	sort.Sort(allTfIdfValues)
-	for _, currentTfIdfValues := range allTfIdfValues {
-		displayTfIdfValues = append(displayTfIdfValues, fmt.Sprint(currentTfIdfValues.Title)+" : "+fmt.Sprint(currentTfIdfValues.TfIdf))
-	}
-
-	fmt.Println(len(displayTfIdfValues))
-	return displayTfIdfValues
+	return allTfIdfValues
 }
 
 func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("static/template.html")
+	if err != nil {
+		log.Fatalf("Could not parse template files %v", err)
+	}
+	var tfIdfValues []TfIdfValue
+
 	// localhost:8080/search?term=query
 	query := r.URL.Query().Get("term")
 	wildcard := r.URL.Query().Get("wildcard")
-	var tfIdfValues []string
 
 	if isBigram(query) {
 		word1, word2 := splitBigram(query)
@@ -119,29 +117,35 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 		if wildcard != "" {
 			tfIdfValues = ebook.bigramWildcardSearch(stemmedWord1, stemmedWord2)
 		} else {
-			tfIdfValues = ebook.bigramSearch(stemmedWord1, stemmedWord2)
+			tfIdfValues = ebook.sortBigramTfIdf(stemmedWord1, stemmedWord2)
 		}
 
 		if len(tfIdfValues) != 0 {
-			w.Write([]byte("Word: " + query + "\n"))
-			for _, tfIdfValue := range tfIdfValues {
-				w.Write([]byte(tfIdfValue + "\n"))
+			// w.Write([]byte("Word: " + query + "\n"))
+			err = t.Execute(w, tfIdfValues)
+			if err != nil {
+				log.Fatalf("Execute: %v", err)
 			}
 		} else {
 			http.Error(w, "Word not found.", http.StatusNotFound)
 		}
 	} else {
 		if stemmedQuery, err := snowball.Stem(query, "english", true); err == nil {
+			fmt.Println(wildcard)
 			if wildcard != "" {
-				_, tfIdfValues = ebook.wildcardSearch(stemmedQuery)
+				tfIdfValues = ebook.wildcardSearch(stemmedQuery)
 			} else {
-				tfIdfValues = ebook.searchDatabase(stemmedQuery)
+				tfIdfValues = ebook.sortTfIdf(stemmedQuery)
 			}
 
 			if err == nil && len(tfIdfValues) != 0 {
-				w.Write([]byte("Word: " + query + "\n"))
-				for _, tfIdfValue := range tfIdfValues {
-					w.Write([]byte(tfIdfValue + "\n"))
+				// w.Write([]byte("Word: " + query + "\n"))
+				// for _, tfIdfValue := range tfIdfValues {
+				// 	w.Write([]byte(tfIdfValue + "\n"))
+				// }
+				err = t.Execute(w, tfIdfValues)
+				if err != nil {
+					log.Fatalf("Execute: %v", err)
 				}
 			} else {
 				http.Error(w, "Word not found.", http.StatusNotFound)
