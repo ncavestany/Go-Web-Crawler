@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
+	exit := make(chan os.Signal, 1)
+	signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
 
 	// Serve the "static" folder at the base URL ("/")
 	http.Handle("/", http.FileServer(http.Dir("static")))
@@ -21,17 +25,16 @@ func main() {
 
 	}()
 
-	url := os.Args[1]
+	url := "https://openai.com/robots.txt"
 	StopWords = createSWmap("stopwords-en.json")
 	ebook := Index{}
 	ebook.initializeDatabase(url)
-	ebook.createRobotMap(url)
+	// ebook.createRobotMap(url)
 	fmt.Println("Finished crawling all urls.")
 
 	// when the server reaches the /search url, use the function search
 	http.HandleFunc("/search", ebook.searchHandlerDatabase)
-	// Use a loop to keep the program running
-	for {
-		time.Sleep(10 * time.Millisecond)
-	}
+
+	<-exit
+	log.Println("Shutting down server.")
 }
