@@ -1,12 +1,35 @@
 <html>
     <head>
         <link rel="stylesheet" href="/project06.css">
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                margin: 20px; 
+            }
+    
+            p {
+                margin: 10px 0; 
+            }
+            a {
+            color: #977569; 
+            }
+    
+            .hits {
+                width: 100%;
+                max-width: 400px;
+                padding: 20px;
+                background-color:rgb(64, 74, 92);
+                border: 1px solid #666; 
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            }
+        </style>
     </head>
     <body>
         <p>Word: {{.Query}}</p>
         {{range .Data}}
         <p class = "hits">
-            {{.Title}} by {{.TfIdf}}
+            {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
         </p>
         {{end}}
     </body>
