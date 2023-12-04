@@ -3,7 +3,8 @@
         <link rel="stylesheet" href="/project06.css">
     </head>
     <body>
-        {{range .}}
+        <p>Word: {{.Query}}</p>
+        {{range .Data}}
         <p class = "hits">
             {{.Title}} by {{.TfIdf}}
         </p>

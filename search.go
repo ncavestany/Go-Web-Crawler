@@ -11,14 +11,9 @@ import (
 	"github.com/kljensen/snowball"
 )
 
-func (ebook *Index) searchDatabase(searchWord string) []string {
-	var displayTfIdfValues []string
-	tfIdfValues := ebook.sortTfIdf(searchWord)
-	for _, currentTfIdfValues := range tfIdfValues {
-		displayTfIdfValues = append(displayTfIdfValues, fmt.Sprint(currentTfIdfValues.Title)+" : "+fmt.Sprint(currentTfIdfValues.TfIdf))
-	}
-
-	return displayTfIdfValues
+type TemplateData struct {
+	Query string
+	Data  []TfIdfValue
 }
 
 func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice) {
@@ -52,19 +47,6 @@ func isBigram(query string) bool {
 func splitBigram(query string) (word1 string, word2 string) {
 	words := strings.Fields(query)
 	return words[0], words[1]
-}
-
-func (ebook *Index) bigramSearch(word1 string, word2 string) []string {
-	var displayTfIdfValues []string
-	tfIdfValues := ebook.sortBigramTfIdf(word1, word2)
-	fmt.Println(word1, word2)
-
-	for _, currentTfIdfValues := range tfIdfValues {
-		displayTfIdfValues = append(displayTfIdfValues, fmt.Sprint(currentTfIdfValues.Title)+" : "+fmt.Sprint(currentTfIdfValues.TfIdf))
-	}
-
-	return displayTfIdfValues
-
 }
 
 // For searching bigram wildcards - example: computer scien% gives computer science and computer scientist.
@@ -122,7 +104,10 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 
 		if len(tfIdfValues) != 0 {
 			// w.Write([]byte("Word: " + query + "\n"))
-			err = t.Execute(w, tfIdfValues)
+			err = t.Execute(w, TemplateData{
+				Query: query,
+				Data:  tfIdfValues,
+			})
 			if err != nil {
 				log.Fatalf("Execute: %v", err)
 			}
@@ -131,7 +116,6 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 		}
 	} else {
 		if stemmedQuery, err := snowball.Stem(query, "english", true); err == nil {
-			fmt.Println(wildcard)
 			if wildcard != "" {
 				tfIdfValues = ebook.wildcardSearch(stemmedQuery)
 			} else {
@@ -140,10 +124,10 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 
 			if err == nil && len(tfIdfValues) != 0 {
 				// w.Write([]byte("Word: " + query + "\n"))
-				// for _, tfIdfValue := range tfIdfValues {
-				// 	w.Write([]byte(tfIdfValue + "\n"))
-				// }
-				err = t.Execute(w, tfIdfValues)
+				err = t.Execute(w, TemplateData{
+					Query: query,
+					Data:  tfIdfValues,
+				})
 				if err != nil {
 					log.Fatalf("Execute: %v", err)
 				}
