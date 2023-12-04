@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/mattn/go-sqlite3 v1.14.18
+
+require gopkg.in/neurosnap/sentences.v1 v1.0.7 // indirect

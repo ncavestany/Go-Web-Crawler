@@ -38,10 +38,20 @@ func extract(exInC *DownloadResult, exOutC chan ExtractResult) {
 		case html.TextNode:
 			p := n.Parent
 			if p.Type == html.ElementNode && (p.Data != "style" && p.Data != "script") {
+				// tokenizer, err := english.NewSentenceTokenizer(nil)
+				// if err != nil {
+				// 	panic(err)
+				// }
+
+				// sentences := tokenizer.Tokenize(strings.TrimSpace(n.Data))
 				newWords := strings.FieldsFunc(n.Data, func(r rune) bool {
 					return !unicode.IsLetter(r) && !unicode.IsNumber(r)
 				})
 				result.words = append(result.words, newWords...)
+				// fmt.Println(newWords)
+				// for _, s := range sentences {
+				// 	result.sentences = append(result.sentences, s.Text)
+				// }
 			}
 		}
 		// go through the child nodes recursively

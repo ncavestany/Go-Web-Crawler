@@ -18,8 +18,8 @@ type DownloadResult struct {
 }
 
 type ExtractResult struct {
-	words, hrefs []string
-	title        string
+	words, hrefs, sentences []string
+	title                   string
 }
 
 func (ebook *Index) downloadDatabase(url string, dlOutC chan DownloadResult) {
@@ -108,6 +108,11 @@ func (ebook *Index) recursiveCrawlDatabase(url string, crawledUrls *map[string]s
 				// If the current url already exists in the frequency table,
 				// do not crawl its words again.
 				if !exists {
+					// for _, sentence := range ex.sentences {
+					// 	// fmt.Println("Current sentence:" + sentence)
+					// 	ebook.addSentence(sentence, url)
+					// }
+
 					for _, word := range ex.words {
 						ebook.updateDatabase(word, url)
 					}
@@ -116,10 +121,9 @@ func (ebook *Index) recursiveCrawlDatabase(url string, crawledUrls *map[string]s
 						ebook.insertBigram(ex.words[i], ex.words[i+1], url)
 					}
 					ebook.addTitle(ex.title, url)
+				} else {
+					fmt.Println(url, "already exists.")
 				}
-				// else {
-				// 	fmt.Println(url, "already exists.")
-				// }
 
 				// Commenting out crawling functionality
 				// for _, currentUrl := range ex.hrefs {
