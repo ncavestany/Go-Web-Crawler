@@ -99,6 +99,19 @@ func (ebook *Index) initializeDatabase(url string) error {
 		return err
 	}
 
+	_, err = db.Exec(`
+	CREATE TABLE IF NOT EXISTS sentences (
+			id INTEGER NOT NULL PRIMARY KEY,
+			sentence TEXT,
+			url_id INTEGER,
+			FOREIGN KEY (url_id) REFERENCES urls(id)
+		)
+	`)
+	if err != nil {
+		log.Fatalf("Could not create or open sentences table %v", err)
+		return err
+	}
+
 	ebook.db = db
 	ebook.prepareStatements()
 
@@ -271,7 +284,7 @@ func (ebook *Index) addNewWordorUrl(tableName string, name string) error {
 				log.Fatalf("Could not insert url %v", err)
 			}
 		}
-		// fmt.Printf("Successfully inserted %s into the %s table.\n", name, tableName)
+		fmt.Printf("Successfully inserted %s into the %s table.\n", name, tableName)
 	}
 
 	return nil
@@ -307,8 +320,8 @@ func (ebook *Index) getWord(wordID int) string {
 // Insert a new row of occurrences or update the amount of occurrences for an
 // existing word.
 func (ebook *Index) addOccurrence(url string, word string) error {
-	urlID := ebook.findID("urls", url)
 	wordID := ebook.findID("words", word)
+	urlID := ebook.findID("urls", url)
 
 	// Check if the row already exists in the frequency table
 	var hits int
@@ -322,7 +335,7 @@ func (ebook *Index) addOccurrence(url string, word string) error {
 				log.Fatalf("Could not insert into frequency table %v", err)
 				return err
 			}
-			// fmt.Printf("Successfully added occurrence with values (Occurrences: 1, url: %s, word: %s)\n", url, word)
+			fmt.Printf("Successfully added occurrence with values (Occurrences: 1, url: %s, word: %s)\n", url, word)
 		}
 	} else {
 		// If the word does exist on the current url, increment its amount of occurrences.
@@ -332,7 +345,7 @@ func (ebook *Index) addOccurrence(url string, word string) error {
 			log.Fatalf("Could not update frequency table %v", err)
 			return err
 		}
-		// fmt.Printf("Successfully updated occurrence to %d for URL: %s and Word: %s\n", hits, url, word)
+		fmt.Printf("Successfully updated occurrence to %d for URL: %s and Word: %s\n", hits, url, word)
 	}
 
 	return nil
@@ -343,6 +356,24 @@ func (ebook *Index) addTitle(title string, url string) {
 	if err != nil {
 		log.Fatalf("Could not add title: %v", err)
 	}
+	fmt.Println("Setting title: " + title + " for url: " + url)
+}
+
+func (ebook *Index) addSentence(sentence string, url string) {
+	urlID := ebook.findID("urls", url)
+	insertQuery := "INSERT INTO sentences (sentence, url_id) VALUES (?, ?)"
+	insertStmt, err := ebook.db.Prepare(insertQuery)
+	if err != nil {
+		log.Fatalf("Error preparing insert statement: %v", err)
+	}
+	defer insertStmt.Close()
+
+	fmt.Println("Inserting sentence:" + sentence + " into table at: " + url)
+	_, err = insertStmt.Exec(sentence, urlID)
+	if err != nil {
+		log.Fatalf("Could not insert into sentences table %v", err)
+	}
+
 }
 
 // Check if either half of the bigram is a stopword - if not stem both.
@@ -359,14 +390,14 @@ func (ebook *Index) validateAndStemBigram(word1 string, word2 string) (string, s
 	return "", ""
 }
 
-func (ebook *Index) insertBigram(word1 string, word2 string, url string) {
+func (ebook *Index) insertBigram(word1, word2, url string) {
 	stemmedWord1, stemmedWord2 := ebook.validateAndStemBigram(word1, word2)
 	if stemmedWord1 != "" {
 		// No need for error handling because these words will always exist in table.
 		word1ID, word2ID := ebook.findID("words", stemmedWord1), ebook.findID("words", stemmedWord2)
+		urlID := ebook.findID("urls", url)
 		// fmt.Println("Word 1 id: " + fmt.Sprintf("%d", word1ID))
 		// fmt.Println("Word 2 id: " + fmt.Sprintf("%d", word2ID))
-		urlID := ebook.findID("urls", url)
 
 		// Check if the row already exists in the frequency table
 		var hits int
@@ -379,7 +410,7 @@ func (ebook *Index) insertBigram(word1 string, word2 string, url string) {
 				if err != nil {
 					log.Fatalf("Could not insert into bigrams table %v", err)
 				}
-				fmt.Printf("Successfully added occurrence with values (Occurrences: 1, url: %s, words: %s %s)\n", url, stemmedWord1, stemmedWord2)
+				// fmt.Printf("Successfully added occurrence with values (Occurrences: 1, url: %s, words: %s %s)\n", url, stemmedWord1, stemmedWord2)
 			}
 		} else {
 			// If the bigram does exist on the current url, increment its amount of occurrences.
@@ -388,7 +419,7 @@ func (ebook *Index) insertBigram(word1 string, word2 string, url string) {
 			if err != nil {
 				log.Fatalf("Could not update bigrams table %v", err)
 			}
-			fmt.Printf("Successfully updated occurrence to %d for URL: %s and Words: %s %s\n", hits, url, stemmedWord1, stemmedWord2)
+			// fmt.Printf("Successfully updated occurrence to %d for URL: %s and Words: %s %s\n", hits, url, stemmedWord1, stemmedWord2)
 		}
 	}
 }
