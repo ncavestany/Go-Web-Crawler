@@ -1,19 +1,21 @@
 <html>
     <head>
         <link rel="stylesheet" href="/project06.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
         <style>
             body {
                 font-family: 'Arial', sans-serif;
                 margin: 0px; 
             }
-    
+
             p {
                 margin: 10px 0; 
             }
+
             a {
                 color: #977569; 
             }
-    
+
             .hits {
                 width: 100%;
                 max-width: 400px;
@@ -26,7 +28,7 @@
             }
 
             .query {
-                color: #f4bc34;;
+                color: #f4bc34;
             }
 
             .error-message {
@@ -46,16 +48,34 @@
                 font-size: smaller;
                 font-style: italic; 
             }
+
+            .search-bar {
+                width: 100%;
+                max-width: 400px;
+                margin: 20px auto; 
+                text-align: center;
+                padding-right: 3%;
+            }
+
         </style>
     </head>
     <body>
+        <div class="search-bar">
+            <form action="/search" method="get">
+                <label for="inputBox">Search again: </label>
+                <input id="inputBox" name="term" placeholder="Search term here"/>
+                <button type="submit" class="pure-button pure-button-primary">
+                    <img src="magnifying-glass-icon.png" alt="Search" class="search-icon">
+            </form>
+        </div>
+
         {{ if .Error }}
             <p class="error-message">{{ .ErrorMessage }}</p>
         {{ else }}
-            <p class = "query">Word: {{.Query}}</p>
+            <p class="query">Search results for: "{{.Query}}"</p>
             {{range .Data}}
-            <p class = "hits">
-                {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
+            <p class="hits">
+                <a href="{{.URL}}" target="_blank">{{.Title}} </a> | {{.TfIdf}}
                 <br>
                 Context: <span class="context">{{.Sentence}}</span>
             </p>
