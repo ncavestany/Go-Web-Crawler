@@ -11,7 +11,7 @@
                 margin: 10px 0; 
             }
             a {
-            color: #977569; 
+                color: #977569; 
             }
     
             .hits {
@@ -25,21 +25,37 @@
                 position: relative;
             }
 
+            .error-message {
+                text-align: center;
+                padding: 20px;
+                background-color:rgb(64, 74, 92);
+                border: 1px solid #666; 
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(204, 0, 0, 0.2);
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
             .context {
-              font-size: smaller;
-              font-style: italic; 
+                font-size: smaller;
+                font-style: italic; 
             }
         </style>
     </head>
     <body>
-        <p>Word: {{.Query}}</p>
-        {{range .Data}}
-        <p class = "hits">
-            {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
-            <br>
-            Context: <span class="context">{{.Sentence}}</span>
-            </br>
-        </p>
-        {{end}}
+        {{ if .Error }}
+            <p class="error-message">{{ .ErrorMessage }}</p>
+        {{ else }}
+            <p>Word: {{.Query}}</p>
+            {{range .Data}}
+            <p class = "hits">
+                {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
+                <br>
+                Context: <span class="context">{{.Sentence}}</span>
+            </p>
+            {{end}}
+        {{ end }}
     </body>
 </html>

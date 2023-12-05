@@ -12,8 +12,10 @@ import (
 )
 
 type TemplateData struct {
-	Query string
-	Data  []TfIdfValue
+	Query        string
+	Data         []TfIdfValue
+	Error        bool
+	ErrorMessage string
 }
 
 func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice) {
@@ -112,7 +114,13 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 				log.Fatalf("Execute: %v", err)
 			}
 		} else {
-			http.Error(w, "Word not found.", http.StatusNotFound)
+			err = t.Execute(w, TemplateData{
+				Error:        true,
+				ErrorMessage: "Word not found.",
+			})
+			if err != nil {
+				log.Fatalf("Execute: %v", err)
+			}
 		}
 	} else {
 		if stemmedQuery, err := snowball.Stem(query, "english", true); err == nil {
@@ -132,7 +140,13 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 					log.Fatalf("Execute: %v", err)
 				}
 			} else {
-				http.Error(w, "Word not found.", http.StatusNotFound)
+				err = t.Execute(w, TemplateData{
+					Error:        true,
+					ErrorMessage: "Word: " + query + " not found.",
+				})
+				if err != nil {
+					log.Fatalf("Execute: %v", err)
+				}
 			}
 
 		} else {
