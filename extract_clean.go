@@ -5,15 +5,20 @@ import (
 	"log"
 	"net/url"
 	"strings"
-	"unicode"
 
 	"golang.org/x/net/html"
+	"gopkg.in/neurosnap/sentences.v1/english"
 )
 
 func extract(exInC *DownloadResult, exOutC chan ExtractResult) {
 	var result ExtractResult
 
 	reader := bytes.NewReader(exInC.body)
+
+	tokenizer, err := english.NewSentenceTokenizer(nil)
+	if err != nil {
+		panic(err)
+	}
 
 	// Parse the HTML content
 	doc, err := html.Parse(reader)
@@ -38,20 +43,13 @@ func extract(exInC *DownloadResult, exOutC chan ExtractResult) {
 		case html.TextNode:
 			p := n.Parent
 			if p.Type == html.ElementNode && (p.Data != "style" && p.Data != "script") {
-				// tokenizer, err := english.NewSentenceTokenizer(nil)
-				// if err != nil {
-				// 	panic(err)
-				// }
 
-				// sentences := tokenizer.Tokenize(strings.TrimSpace(n.Data))
-				newWords := strings.FieldsFunc(n.Data, func(r rune) bool {
-					return !unicode.IsLetter(r) && !unicode.IsNumber(r)
-				})
-				result.words = append(result.words, newWords...)
-				// fmt.Println(newWords)
-				// for _, s := range sentences {
-				// 	result.sentences = append(result.sentences, s.Text)
-				// }
+				sentences := tokenizer.Tokenize(strings.TrimSpace(n.Data))
+
+				for _, s := range sentences {
+					result.sentences = append(result.sentences, s.Text)
+					// fmt.Println(s.Text)
+				}
 			}
 		}
 		// go through the child nodes recursively
@@ -60,6 +58,7 @@ func extract(exInC *DownloadResult, exOutC chan ExtractResult) {
 		}
 	}
 	f(doc)
+
 	// Put the results into the extract output channel
 	exOutC <- result
 }

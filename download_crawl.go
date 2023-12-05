@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/kljensen/snowball"
 )
@@ -18,8 +20,8 @@ type DownloadResult struct {
 }
 
 type ExtractResult struct {
-	words, hrefs, sentences []string
-	title                   string
+	hrefs, sentences []string
+	title            string
 }
 
 func (ebook *Index) downloadDatabase(url string, dlOutC chan DownloadResult) {
@@ -108,17 +110,21 @@ func (ebook *Index) recursiveCrawlDatabase(url string, crawledUrls *map[string]s
 				// If the current url already exists in the frequency table,
 				// do not crawl its words again.
 				if !exists {
-					// for _, sentence := range ex.sentences {
-					// 	// fmt.Println("Current sentence:" + sentence)
-					// 	ebook.addSentence(sentence, url)
-					// }
-
-					for _, word := range ex.words {
-						ebook.updateDatabase(word, url)
-					}
-					for i := 0; i < len(ex.words)-1; i++ {
-						// fmt.Println(ex.words[i] + " " + ex.words[i+1])
-						ebook.insertBigram(ex.words[i], ex.words[i+1], url)
+					var currentWords []string
+					currentUrlID := ebook.findID("urls", url)
+					for _, sentence := range ex.sentences {
+						// fmt.Println("Current sentence:" + sentence)
+						ebook.addSentence(sentence, currentUrlID)
+						currentWords = strings.FieldsFunc(sentence, func(r rune) bool {
+							return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+						})
+						for _, word := range currentWords {
+							ebook.updateDatabase(word, sentence, currentUrlID)
+						}
+						for i := 0; i < len(currentWords)-1; i++ {
+							// fmt.Println(ex.words[i] + " " + ex.words[i+1])
+							ebook.insertBigram(currentWords[i], currentWords[i+1], sentence, currentUrlID)
+						}
 					}
 					ebook.addTitle(ex.title, url)
 				} else {
@@ -149,12 +155,12 @@ func (ebook *Index) recursiveCrawlDatabase(url string, crawledUrls *map[string]s
 	}()
 }
 
-func (ebook *Index) updateDatabase(word string, url string) {
+func (ebook *Index) updateDatabase(word, sentence string, urlID int) {
 	if stemmedWord, err := snowball.Stem(word, "english", true); err == nil {
 		// If the stemmed word is not in the stopword map, then add it.
 		if _, exists := StopWords[stemmedWord]; !exists {
 			ebook.addNewWordorUrl("words", stemmedWord)
-			ebook.addOccurrence(url, stemmedWord)
+			ebook.addOccurrence(urlID, stemmedWord, sentence)
 		}
 	}
 }

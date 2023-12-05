@@ -41,4 +41,5 @@ type prepStatements struct {
 	getAllUrlsForWord     *sql.Stmt
 	getTotalDocsForBigram *sql.Stmt
 	getAllURLsForBigram   *sql.Stmt
+	getSentenceID         *sql.Stmt
 }
