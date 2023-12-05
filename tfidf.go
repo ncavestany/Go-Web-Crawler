@@ -10,9 +10,10 @@ import (
 )
 
 type TfIdfValue struct {
-	URL   string
-	Title string
-	TfIdf float64
+	URL      string
+	Title    string
+	Sentence string
+	TfIdf    float64
 }
 
 type TfIdfSlice []TfIdfValue
@@ -161,6 +162,39 @@ func (ebook *Index) getTitle(urlID int) string {
 	return title
 }
 
+func (ebook *Index) getSentence(sentenceID int) string {
+	var sentence string
+	err := ebook.queries.getSentence.QueryRow(sentenceID).Scan(&sentence)
+	if err != nil {
+		log.Fatalf("Could not find sentence %v", err)
+	}
+	return sentence
+}
+
+func (ebook *Index) getFreqSentence(urlID, wordID int) string {
+	var sentenceID int
+	var sentence string
+	err := ebook.queries.getFreqSentence.QueryRow(urlID, wordID).Scan(&sentenceID)
+	if err != nil {
+		log.Fatalf("Could not find freq sentence %v", err)
+	}
+
+	sentence = ebook.getSentence(sentenceID)
+	return sentence
+}
+
+func (ebook *Index) getBigramFreqSentence(urlID, word1ID, word2ID int) string {
+	var sentenceID int
+	var sentence string
+	err := ebook.queries.getBigramFreqSentence.QueryRow(urlID, word1ID, word2ID).Scan(&sentenceID)
+	if err != nil {
+		log.Fatalf("Could not find bigram freq sentence %v", err)
+	}
+
+	sentence = ebook.getSentence(sentenceID)
+	return sentence
+}
+
 // Print out the tf-idf value of a specific word on a specific url.
 func (ebook *Index) getTfIdf(word, url string) float64 {
 	urlID := ebook.findID("urls", url)
@@ -209,8 +243,9 @@ func (ebook *Index) sortTfIdf(word string) (tfIdfValues []TfIdfValue) {
 	for _, urlID := range validURLIDs {
 		url := ebook.getURL(urlID)
 		title := ebook.getTitle(urlID)
+		sentence := ebook.getFreqSentence(urlID, wordID)
 		tfIdf := ebook.getTfIdf(stemmedTerm, url)
-		tfIdfValues = append(tfIdfValues, TfIdfValue{Title: title, URL: url, TfIdf: tfIdf})
+		tfIdfValues = append(tfIdfValues, TfIdfValue{Title: title, URL: url, TfIdf: tfIdf, Sentence: sentence})
 	}
 	sort.Slice(tfIdfValues, func(i, j int) bool {
 		if tfIdfValues[i].TfIdf == tfIdfValues[j].TfIdf {
@@ -268,9 +303,10 @@ func (ebook *Index) sortBigramTfIdf(word1, word2 string) (tfIdfValues TfIdfSlice
 	for _, urlID := range validURLIDs {
 		url := ebook.getURL(urlID)
 		title := ebook.getTitle(urlID)
+		sentence := ebook.getBigramFreqSentence(urlID, word1ID, word2ID)
 		tfIdf := ebook.getBigramTfIdf(word1, word2, url)
 		// fmt.Println("Current url:", title, "Current bigram:", word1, word2, "Current TF-IDF:", tfIdf)
-		tfIdfValues = append(tfIdfValues, TfIdfValue{Title: title, URL: url, TfIdf: tfIdf})
+		tfIdfValues = append(tfIdfValues, TfIdfValue{Title: title, URL: url, TfIdf: tfIdf, Sentence: sentence})
 	}
 	sort.Slice(tfIdfValues, func(i, j int) bool {
 		if tfIdfValues[i].TfIdf == tfIdfValues[j].TfIdf {

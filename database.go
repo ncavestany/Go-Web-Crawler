@@ -270,6 +270,27 @@ func (ebook *Index) prepareStatements() {
 	}
 	ebook.queries.getSentenceID = getSentenceIDStmt
 
+	stmt = "SELECT sentence FROM sentences WHERE id=?"
+	getSentenceStmt, err := ebook.db.Prepare(stmt)
+	if err != nil {
+		log.Fatalf("Could not prepare sentence select stmt: %v", err)
+	}
+	ebook.queries.getSentence = getSentenceStmt
+
+	stmt = "SELECT sentence_id FROM frequency WHERE url_id=? AND word_id=?"
+	getFreqSentenceStmt, err := ebook.db.Prepare(stmt)
+	if err != nil {
+		log.Fatalf("Could not prepare statement: %v", err)
+	}
+	ebook.queries.getFreqSentence = getFreqSentenceStmt
+
+	stmt = "SELECT sentence_id FROM bigrams WHERE url_id=? AND word1_id=? AND word2_id=?"
+	getBigramFreqSentenceStmt, err := ebook.db.Prepare(stmt)
+	if err != nil {
+		log.Fatalf("Could not prepare statement: %v", err)
+	}
+	ebook.queries.getBigramFreqSentence = getBigramFreqSentenceStmt
+
 }
 
 // Insert a unique word or url into the corresponding table.

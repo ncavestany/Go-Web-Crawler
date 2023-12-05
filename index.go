@@ -42,4 +42,7 @@ type prepStatements struct {
 	getTotalDocsForBigram *sql.Stmt
 	getAllURLsForBigram   *sql.Stmt
 	getSentenceID         *sql.Stmt
+	getSentence           *sql.Stmt
+	getFreqSentence       *sql.Stmt
+	getBigramFreqSentence *sql.Stmt
 }

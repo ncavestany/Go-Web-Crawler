@@ -4,7 +4,7 @@
         <style>
             body {
                 font-family: 'Arial', sans-serif;
-                margin: 20px; 
+                margin: 0px; 
             }
     
             p {
@@ -22,6 +22,12 @@
                 border: 1px solid #666; 
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+
+            .context {
+              font-size: smaller;
+              font-style: italic; 
             }
         </style>
     </head>
@@ -30,6 +36,9 @@
         {{range .Data}}
         <p class = "hits">
             {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
+            <br>
+            Context: <span class="context">{{.Sentence}}</span>
+            </br>
         </p>
         {{end}}
     </body>
