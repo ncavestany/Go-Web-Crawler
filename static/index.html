@@ -1,23 +1,25 @@
 <html>
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
-        <link rel="stylesheet" href="project06.css"> 
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="project06.css"> 
     <title> CS 272 Index Search </title>
-    </head>
-    <body class="home-page">
-        <h1> CS 272 Index Search </h1>
-        <form action="/search" method="get">
-            <label for="inputBox">Search</label>
-            <input id="inputBox" name="term" placeholder="Search term here"/>
-            <button type="submit" class="pure-button pure-button-primary">Go</button>
-            <br>
-            <div class="tooltip">
-                <input type="checkbox" id="wildcard" name="wildcard" value="wildcard">
-                <label for="wildcard">Wildcard Search</label>
-                <span class="tooltiptext"> Search for words with the same prefix.
-                    Ex: ball returns results for balloon, ballerina.
-                </span>
-            </div>
-        </form>
-    </body>
+</head>
+<body class="home-page">
+    <h1> CS 272 Index Search </h1>
+    <form action="/search" method="get">
+        <label for="inputBox" class="visually-hidden">Search</label>
+        <input id="inputBox" name="term" placeholder="Search term here"/>
+        <button type="submit" class="pure-button pure-button-primary">
+            <img src="magnifying-glass-icon.png" alt="Search" class="search-icon">
+        </button>
+        <br>
+        <div class="tooltip">
+            <input type="checkbox" id="wildcard" name="wildcard" value="wildcard">
+            <label for="wildcard">Wildcard Search</label>
+            <span class="tooltiptext"> Search for words with the same prefix.
+                Ex: ball returns results for balloon, ballerina.
+            </span>
+        </div>
+    </form>
+</body>
 </html>
