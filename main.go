@@ -26,11 +26,11 @@ func main() {
 
 	}()
 
-	url := "https://openai.com/robots.txt"
+	url := "https://scu.edu/robots.txt"
 	StopWords = createSWmap("stopwords-en.json")
 	ebook := Index{}
 	ebook.initializeDatabase(url)
-	// ebook.createRobotMap(url)
+	ebook.createRobotMap(url)
 	fmt.Println("Finished crawling all urls.")
 
 	// when the server reaches the /search url, use the function search
