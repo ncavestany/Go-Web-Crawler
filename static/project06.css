@@ -15,6 +15,13 @@ body.home-page {
 
 h1 {
     font-style: oblique;
+    color: #f4bc34;
+}
+
+h2 {
+    margin-top: 0%;
+    font-style: oblique;
+    color: #337d5e;
 }
 
 .search-icon {

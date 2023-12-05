@@ -18,11 +18,15 @@
                 width: 100%;
                 max-width: 400px;
                 padding: 20px;
-                background-color:rgb(64, 74, 92);
+                background-color:#404a5c;
                 border: 1px solid #666; 
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
                 position: relative;
+            }
+
+            .query {
+                color: #f4bc34;;
             }
 
             .error-message {
@@ -48,7 +52,7 @@
         {{ if .Error }}
             <p class="error-message">{{ .ErrorMessage }}</p>
         {{ else }}
-            <p>Word: {{.Query}}</p>
+            <p class = "query">Word: {{.Query}}</p>
             {{range .Data}}
             <p class = "hits">
                 {{.TfIdf}} in <a href="{{.URL}}" target="_blank">{{.Title}}</a> 
