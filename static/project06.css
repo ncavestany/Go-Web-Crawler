@@ -10,6 +10,11 @@ body {
     flex-direction: column;
     background-color: #333;
     color: #fff;
+    background-image: url('falling-snowflakes.webp');
+    background-repeat: repeat-y;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 body.home-page {
@@ -19,6 +24,32 @@ body.home-page {
 h1 {
     font-style: oblique;
     color: #f4bc34;
+}
+
+h1:hover {
+    text-decoration: underline;
+}
+
+h1.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+h1.tooltip .tooltiptext {
+    font-size: small;
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: -100%;
+    left: 10%;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 h2 {
