@@ -198,8 +198,13 @@ func (ebook *Index) getBigramFreqSentence(urlID, word1ID, word2ID int) string {
 	if err != nil {
 		log.Fatalf("Could not find bigram freq sentence %v", err)
 	}
-
 	sentence = ebook.getSentence(sentenceID)
+
+	for len(sentence) < 100 {
+		sentenceID++
+		sentence += " " + ebook.getSentence(sentenceID)
+	}
+
 	return sentence
 }
 
