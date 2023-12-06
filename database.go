@@ -37,6 +37,7 @@ func extractSubdomain(rawURL string) string {
 // Create all the initial tables if they do not exist.
 func (ebook *Index) initializeDatabase(url string) error {
 	subDomain := extractSubdomain(url)
+	ebook.databaseName = subDomain
 	db, err := sql.Open("sqlite3", subDomain+".db")
 	if err != nil {
 		fmt.Println(err)

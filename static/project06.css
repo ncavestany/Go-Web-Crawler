@@ -17,6 +17,10 @@ body {
     background-size: cover;
 }
 
+form {
+    text-align: center;
+}
+
 body.home-page {
     height: 100vh;
 }

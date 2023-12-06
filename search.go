@@ -14,6 +14,7 @@ import (
 type TemplateData struct {
 	Query        string
 	Data         []TfIdfValue
+	DatabaseName string
 	Error        bool
 	ErrorMessage template.HTML
 }
@@ -105,16 +106,17 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 		}
 
 		if len(tfIdfValues) != 0 {
-			// w.Write([]byte("Word: " + query + "\n"))
 			err = t.Execute(w, TemplateData{
-				Query: query,
-				Data:  tfIdfValues,
+				DatabaseName: ebook.databaseName,
+				Query:        query,
+				Data:         tfIdfValues,
 			})
 			if err != nil {
 				log.Fatalf("Execute: %v", err)
 			}
 		} else {
 			err = t.Execute(w, TemplateData{
+				DatabaseName: ebook.databaseName,
 				Error:        true,
 				ErrorMessage: template.HTML("Word: " + "<strong>" + query + "</strong>" + " not found."),
 			})
@@ -131,16 +133,17 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 			}
 
 			if err == nil && len(tfIdfValues) != 0 {
-				// w.Write([]byte("Word: " + query + "\n"))
 				err = t.Execute(w, TemplateData{
-					Query: query,
-					Data:  tfIdfValues,
+					DatabaseName: ebook.databaseName,
+					Query:        query,
+					Data:         tfIdfValues,
 				})
 				if err != nil {
 					log.Fatalf("Execute: %v", err)
 				}
 			} else {
 				err = t.Execute(w, TemplateData{
+					DatabaseName: ebook.databaseName,
 					Error:        true,
 					ErrorMessage: template.HTML("Word: " + "<strong>" + query + "</strong>" + " not found."),
 				})

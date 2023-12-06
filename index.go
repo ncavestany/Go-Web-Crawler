@@ -8,10 +8,11 @@ import (
 var StopWords map[string]struct{}
 
 type Index struct {
-	robots  map[string]rules
-	db      *sql.DB
-	queries prepStatements
-	mu      sync.Mutex
+	robots       map[string]rules
+	db           *sql.DB
+	queries      prepStatements
+	mu           sync.Mutex
+	databaseName string
 }
 
 type rules struct {

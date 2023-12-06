@@ -29,6 +29,10 @@
                 color: #f4bc34;
             }
 
+            .database-name {
+                font-weight: bold;
+            }
+
             a.title {
                 text-decoration: none; 
                 color: white; 
@@ -89,7 +93,7 @@
                     <img src="magnifying-glass-icon.png" alt="Search" class="search-icon">
             </form>
         </div>
-
+        <p class="database-name"> Current database: {{.DatabaseName}}</p>
         {{ if .Error }}
             <p class="error-message">{{ .ErrorMessage }}</p>
         {{ else }}
