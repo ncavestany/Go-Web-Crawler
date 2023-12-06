@@ -72,6 +72,7 @@ func (ebook *Index) initializeDatabase(url string) error {
 			id INTEGER NOT NULL PRIMARY KEY,
 			sentence TEXT,
 			url_id INTEGER,
+			UNIQUE(sentence, url_id),
 			FOREIGN KEY (url_id) REFERENCES urls(id)
 		)
 	`)
@@ -409,11 +410,7 @@ func (ebook *Index) addSentence(sentence string, urlID int) {
 	defer insertStmt.Close()
 
 	// fmt.Println("Inserting sentence:" + sentence + " into table at: " + url)
-	_, err = insertStmt.Exec(sentence, urlID)
-	if err != nil {
-		log.Fatalf("Could not insert into sentences table %v", err)
-	}
-
+	insertStmt.Exec(sentence, urlID)
 }
 
 // Check if either half of the bigram is a stopword - if not stem both.
