@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/kljensen/snowball"
 )
@@ -12,7 +14,7 @@ import (
 type TfIdfValue struct {
 	URL      string
 	Title    string
-	Sentence string
+	Sentence template.HTML
 	TfIdf    float64
 }
 
@@ -171,15 +173,18 @@ func (ebook *Index) getSentence(sentenceID int) string {
 	return sentence
 }
 
-func (ebook *Index) getFreqSentence(urlID, wordID int) string {
+func (ebook *Index) getFreqSentence(urlID, wordID int) template.HTML {
 	var sentenceID int
 	var sentence string
 	err := ebook.queries.getFreqSentence.QueryRow(urlID, wordID).Scan(&sentenceID)
 	if err != nil {
 		log.Fatalf("Could not find freq sentence %v", err)
 	}
+	query := ebook.getWord(wordID)
 
 	sentence = ebook.getSentence(sentenceID)
+	// Bolding the query term in the sentence
+	sentence = strings.ReplaceAll(sentence, query, "<strong>"+query+"</strong>")
 
 	// If the sentence is too short (usually only one word)
 	// add the next sentence.
@@ -188,10 +193,10 @@ func (ebook *Index) getFreqSentence(urlID, wordID int) string {
 		sentence += " " + ebook.getSentence(sentenceID)
 	}
 
-	return sentence
+	return template.HTML(sentence)
 }
 
-func (ebook *Index) getBigramFreqSentence(urlID, word1ID, word2ID int) string {
+func (ebook *Index) getBigramFreqSentence(urlID, word1ID, word2ID int) template.HTML {
 	var sentenceID int
 	var sentence string
 	err := ebook.queries.getBigramFreqSentence.QueryRow(urlID, word1ID, word2ID).Scan(&sentenceID)
@@ -205,7 +210,7 @@ func (ebook *Index) getBigramFreqSentence(urlID, word1ID, word2ID int) string {
 		sentence += " " + ebook.getSentence(sentenceID)
 	}
 
-	return sentence
+	return template.HTML(sentence)
 }
 
 // Print out the tf-idf value of a specific word on a specific url.
