@@ -15,7 +15,7 @@ type TemplateData struct {
 	Query        string
 	Data         []TfIdfValue
 	Error        bool
-	ErrorMessage string
+	ErrorMessage template.HTML
 }
 
 func (ebook *Index) wildcardSearch(searchWord string) (allTfIdfValues TfIdfSlice) {
@@ -116,7 +116,7 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 		} else {
 			err = t.Execute(w, TemplateData{
 				Error:        true,
-				ErrorMessage: "Word not found.",
+				ErrorMessage: template.HTML("Word: " + "<strong>" + query + "</strong>" + " not found."),
 			})
 			if err != nil {
 				log.Fatalf("Execute: %v", err)
@@ -142,7 +142,7 @@ func (ebook *Index) searchHandlerDatabase(w http.ResponseWriter, r *http.Request
 			} else {
 				err = t.Execute(w, TemplateData{
 					Error:        true,
-					ErrorMessage: "Word: " + query + " not found.",
+					ErrorMessage: template.HTML("Word: " + "<strong>" + query + "</strong>" + " not found."),
 				})
 				if err != nil {
 					log.Fatalf("Execute: %v", err)
