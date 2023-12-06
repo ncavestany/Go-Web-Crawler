@@ -180,6 +180,14 @@ func (ebook *Index) getFreqSentence(urlID, wordID int) string {
 	}
 
 	sentence = ebook.getSentence(sentenceID)
+
+	// If the sentence is too short (usually only one word)
+	// add the next sentence.
+	for len(sentence) < 100 {
+		sentenceID++
+		sentence += " " + ebook.getSentence(sentenceID)
+	}
+
 	return sentence
 }
 
