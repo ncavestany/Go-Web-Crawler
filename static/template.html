@@ -24,11 +24,24 @@
                 border: 1px solid #666; 
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-                position: relative;
             }
 
             .query {
                 color: #f4bc34;
+            }
+
+            .title {
+                color:white
+            }
+
+            a.title {
+                text-decoration: none; 
+                color: white; 
+            }
+
+            a.title:hover {
+                text-decoration: underline; 
+                color: #977569; 
             }
 
             .error-message {
@@ -49,12 +62,24 @@
                 font-style: italic; 
             }
 
+            .context-header {
+                display: block;
+                margin-top: 5px;
+            }
+
             .search-bar {
                 width: 100%;
                 max-width: 400px;
                 margin: 20px auto; 
                 text-align: center;
                 padding-right: 3%;
+            }
+            
+            .url {
+                font-style: italic;
+                font-size: smaller;
+                display: block;
+                margin-bottom: -15px;
             }
 
         </style>
@@ -75,9 +100,12 @@
             <p class="query">Search results for: "{{.Query}}"</p>
             {{range .Data}}
             <p class="hits">
-                <a href="{{.URL}}" target="_blank">{{.Title}} </a> | {{.TfIdf}}
+                <a class="url" href="{{.URL}}" target="_blank">{{.URL}} </a>
                 <br>
-                Context: <span class="context">{{.Sentence}}</span>
+                <a class="title" href="{{.URL}}" target="_blank">{{.Title}} </a> | {{.TfIdf}}
+                <br>
+                <span class="context-header"> Context: </span> 
+                <span class="context">{{.Sentence}}</span>
             </p>
             {{end}}
         {{ end }}
