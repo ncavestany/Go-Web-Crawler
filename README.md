@@ -28,4 +28,16 @@ This project is a versatile web crawler written in Go that enables users to extr
 
 - **TF-IDF Calculation:** Results are sorted using TF-IDF calculations, ensuring that the most relevant content appears first in the search results.
 
+## Screenshots
 
+**Homepage**
+ ![Homepage](https://cdn.discordapp.com/attachments/428973514557751297/1187618245168074872/image.png?ex=65978aae&is=658515ae&hm=1ae70fb62530c18fc88301b407721e5ccc2ba726d99be29bff05fb31a389a53e& "Homepage")
+
+**Searching**
+![Searching](https://cdn.discordapp.com/attachments/428973514557751297/1187618294094639214/image.png?ex=65978aba&is=658515ba&hm=5dd2c59b761cc8b107db387c04785cffb99b266d5bac2235acda659593a732c3& "Searching")
+
+**Bigram Search**
+![Bigram Search](https://cdn.discordapp.com/attachments/428973514557751297/1187618369558564885/image.png?ex=65978acc&is=658515cc&hm=717d3a31c684011760a54c3316b339debba2b3cfe6e13ea560c1e04d6b2376d5& "Bigram Search")
+
+**Wildcard Search**
+![Wildcard Search](https://cdn.discordapp.com/attachments/428973514557751297/1187618446528229376/image.png?ex=65978ade&is=658515de&hm=496176d6025d3017661f13237bed27bff03659a0487423eb28401b2b1b366110& "Wildcard Search")
